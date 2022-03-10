@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  database:
+    container_name: mariadb
+    image: mariadb:latest
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    environment:
+      - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=yes
+      - MARIADB_DATABASE=ejbca
+      - MARIADB_USER=ejbca
+      - MARIADB_PASSWORD=Primekey1234
+    networks:
+      - ejbca_network
+  
+  ejbca:
+    container_name: ejbca
+    image: primekey/ejbca-ce:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - DATABASE_JDBC_URL=jdbc:mysql://database:3306/ejbca?characterEncoding=UTF-8
+      - DATABASE_USER=ejbca
+      - DATABASE_PASSWORD=Primekey1234
+      - TLS_SETUP_ENABLED=simple
+    networks:
+      - ejbca_network
+    ports:
+      - 8080:8080
+      - 8443:8443
+    depends_on:
+      - database
+
+networks:
+  ejbca_network:
+    name: ejbca_network
+
+volumes:
+  mariadb_data:

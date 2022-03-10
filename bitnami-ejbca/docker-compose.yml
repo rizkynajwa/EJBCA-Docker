@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  mariadb:
+    container_name: mariadb
+    image: bitnami/mariadb:latest
+    volumes:
+      - mariadb_data:/bitnami/mariadb
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_DATABASE=bitnami_ejbca
+      - MARIADB_USER=bn_ejbca
+      - MARIADB_PASSWORD=Bitnami1234
+    networks:
+      - ejbca_network
+  
+  ejbca:
+    container_name: ejbca
+    image: bitnami/ejbca:latest
+    volumes:
+      - ejbca_data:/bitnami/ejbca
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - EJBCA_DATABASE_HOST=mariadb
+      - EJBCA_DATABASE_NAME=bitnami_ejbca
+      - EJBCA_DATABASE_USERNAME=bn_ejbca
+      - EJBCA_DATABASE_PASSWORD=Bitnami1234
+    networks:
+      - ejbca_network
+    ports:
+      - 8080:8080
+      - 8443:8443
+    depends_on:
+      - mariadb
+
+networks:
+  ejbca_network:
+    name: ejbca_network
+
+volumes:
+  mariadb_data:
+  ejbca_data:
+
